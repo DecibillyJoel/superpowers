@@ -31,10 +31,11 @@ disagree.
   costs nothing. Only V1 sessions have `close_agent` — there, close
   reviewers when their review returns, and close each implementer
   after its task's review passes.
-- **Model names:** never copy a model name from a skill, table, or old
-  session into `spawn_agent` without checking it against your current
-  spawn allowlist — V2 accepts only V2-capable presets and hard-errors
-  on the rest.
+- **Model names:** never name a model in `spawn_agent` on your own
+  initiative. Ask your human partner first, and only then check the name
+  against your current spawn allowlist — V2 accepts only V2-capable
+  presets and hard-errors on the rest. Never copy a model name from a
+  skill, table, or old session.
 
 ## Waiting on children
 
@@ -61,16 +62,22 @@ two-thirds of all wait calls were short polls that timed out.
 
 ## Model routing on spawns
 
-Every `spawn_agent` you issue — including when you are yourself a
-spawned child running a fan-out — sets `model` AND `reasoning_effort`
-explicitly, per the Model Selection rules of the skill you are
-executing. Setting `model` alone is a trap: the child's effort
-silently resets to that model's default, not to yours.
+Never set `model` on a `spawn_agent` on your own initiative. Ask your
+human partner to approve the name first, per the Model Selection rules
+of the skill you are executing. A spawn with no `model` inherits your
+own tier, which costs exactly what your turns cost.
+
+Do not raise `reasoning_effort` on your own either. That is the same kind
+of spending decision. Setting `model` alone is a further trap: the
+child's effort silently resets to that model's default, not to yours.
+
+A spawned child that runs a fan-out cannot reach your human partner. It
+must therefore leave `model` and `reasoning_effort` off every spawn and
+pass the parent's tier down unchanged.
 
 Ask your human partner to add a machine-level backstop to
-`~/.codex/config.toml` so any spawn that slips through still routes to
-a deliberate tier instead of silently inheriting the session's most
-expensive model:
+`~/.codex/config.toml`, so a spawn that reaches the tool without an
+approved model still routes to the tier your partner chose:
 
 ```toml
 [agents]

@@ -1129,7 +1129,7 @@ Before sharing a Skill, verify:
 ### Testing
 
 * [ ] At least three evaluations created
-* [ ] Tested with Haiku, Sonnet, and Opus
+* [ ] Tested with each model you plan to use (see "Test with all models you plan to use")
 * [ ] Tested with real usage scenarios
 * [ ] Team feedback incorporated (if applicable)
 

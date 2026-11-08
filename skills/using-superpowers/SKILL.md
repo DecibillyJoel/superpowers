@@ -19,7 +19,7 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 **Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
 
-**Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
+**Before you plan:** if you haven't already brainstormed, invoke the brainstorming skill first.
 
 Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it has a checklist, create a todo per item.
 
@@ -55,6 +55,7 @@ If your harness appears here, read its reference file for special instructions:
 
 - Claude Code: `references/claude-code-tools.md`
 - Codex: `references/codex-tools.md`
+- Gemini CLI: `references/gemini-tools.md`
 - Pi: `references/pi-tools.md`
 - Antigravity: `references/antigravity-tools.md`
 - Hermes Agent: `references/hermes-tools.md`

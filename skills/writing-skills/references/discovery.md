@@ -150,7 +150,7 @@ When searching, dispatch subagent with template...
 [20 lines of repeated instructions]
 
 # ✅ GOOD: Reference other skill
-Always use subagents (50-100x context savings). REQUIRED: Use [other-skill-name] for workflow.
+Delegate to a subagent when the results would bloat your context. REQUIRED: Use [other-skill-name] for workflow.
 ```
 
 **Compress examples:**

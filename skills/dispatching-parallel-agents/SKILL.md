@@ -13,6 +13,13 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
+Fan out for wall-clock time, not by default. Each agent starts with its own
+clean context, so it re-reads what one agent would have read once. For two or
+three small independent fixes, use a single agent. Fan out when each domain
+genuinely needs its own full read. Leave `model` off every dispatch unless
+your human partner approved a name for it; each agent then inherits your
+session's model.
+
 ## When to Use
 
 ```dot
@@ -81,7 +88,7 @@ Multiple dispatch calls in one response = parallel execution. One per response =
 When agents return:
 - Read each summary
 - Verify fixes don't conflict
-- Run full test suite
+- Run the full test suite once, after all fixes are integrated
 - Integrate all changes
 
 ## Agent Prompt Structure
@@ -163,5 +170,5 @@ Agent 3 → Fix tool-approval-race-conditions.test.ts
 After agents return:
 1. **Review each summary** - Understand what changed
 2. **Check for conflicts** - Did agents edit same code?
-3. **Run full suite** - Verify all fixes work together
+3. **Confirm the suite from the integration step is still green** - Do not run it a second time
 4. **Spot check** - Agents can make systematic errors

@@ -1,5 +1,18 @@
 # Superpowers Release Notes
 
+## Unreleased
+
+This is a fork of `obra/superpowers` taken at v7.0.2. The fork corrects claims about how a subagent chooses its model, and other instructions that made an agent spend more than the work needed.
+
+- **An omitted model inherits the calling session's model. It does not escalate to the top tier.** Several files stated or implied that leaving the `model` field off a dispatch silently routes to the most capable and most expensive model. That claim is false. The `pi-subagents` default is `inherit parent`, so an omitted model costs exactly what the calling session already pays.
+- **A subagent's model now needs your approval before it is named.** The earlier correction still left the controller choosing tiers on its own. It no longer does. The default is to omit `model`, so the subagent inherits the calling session's model. The controller asks before every dispatch that would name a model, states the model and the reason, and adds the field only after you approve that name. If you do not answer, the dispatch carries no `model` field. A subagent that runs its own fan-out cannot reach you, so it never names a model. Applied in `skills/subagent-driven-development/SKILL.md`, `implementer-prompt.md`, `task-reviewer-prompt.md`, `re-review-prompt.md`, `references/final-review.md`, `references/fix-loop.md`, `references/handling-reports.md`, `skills/executing-plans/SKILL.md`, `skills/writing-plans/SKILL.md`, `skills/dispatching-parallel-agents/SKILL.md`, and `skills/using-superpowers/references/pi-tools.md`, `claude-code-tools.md`, `codex-tools.md`.
+- **A re-dispatch resumes the implementer when it can.** `references/handling-reports.md` told the controller to re-dispatch a BLOCKED implementer with the same model, which rebuilds a context that a resume already has.
+- **Parallel dispatch carries a cost rule.** `skills/dispatching-parallel-agents/SKILL.md` now says to fan out for wall-clock time, not by default, because each fresh agent re-reads what one agent would have read once.
+- **The integration check no longer runs the suite twice.** `skills/dispatching-parallel-agents/SKILL.md` confirmed the same whole-suite run in two places.
+- **The harness references no longer name features Pi does not have.** `skills/using-superpowers/SKILL.md` no longer says "plan mode", and the platform list now routes Gemini CLI to its reference file.
+- **The worktree safety check tests the directory it chose.** `skills/using-git-worktrees/SKILL.md` accepted either candidate directory as ignored, not the one it selected.
+- **The skill-authoring guidance names the right directories.** `skills/writing-skills/SKILL.md` now gives the Pi skills path and no longer implies that every test must run on three model tiers.
+
 ## v7.0.2 (2026-11-03)
 
 This release further tunes brainstorming's questions. It asks fewer of them, starts by asking why, and when there's a choice to make it gives you options to pick from. It also fixes bootstrap problems on six harnesses, and makes the SDD and executing-plans helper scripts much harder to point at the wrong repository or the wrong task.
@@ -166,7 +179,7 @@ The new `diagnosing-superpowers` skill figures out what went wrong in a session.
 
 **Heads up:** `executing-plans` no longer stops every few tasks to check in with you. It runs the whole plan, then gets one review at the end.
 
-- **Native (inline) execution is now a real mode.** `executing-plans` was a 64-line stub that measured the same as running with no plugin at all. It is rebuilt: the session implements every task itself under the same workspace, ledger, and stopping rules as subagent-driven development, then dispatches one fresh whole-branch review on the most capable model. `task-start` and `task-done` helpers keep the ledger and test log honest. It is the cheapest way to run a plan and runs well on a mid-tier session model. (#2318)
+- **Native (inline) execution is now a real mode.** `executing-plans` was a 64-line stub that measured the same as running with no plugin at all. It is rebuilt: the session implements every task itself under the same workspace, ledger, and stopping rules as subagent-driven development, then dispatches one fresh whole-branch review on the model you approve. `task-start` and `task-done` helpers keep the ledger and test log honest. It is the cheapest way to run a plan and runs well on a mid-tier session model. (#2318)
 - **The plan handoff offers two approaches, Subagent-driven and Native,** says what each costs, and recommends one for this plan with a reason drawn from the plan. If you already chose one, it keeps your choice. (#2258, #2318)
 
 ### Writing Plans
@@ -191,7 +204,7 @@ The new `diagnosing-superpowers` skill figures out what went wrong in a session.
 
 - **Plans with the same basename no longer share a workspace.** `docs/alpha/plan.md` and `docs/beta/plan.md` resolved to one directory and `task-brief` silently overwrote the other plan's brief. Each workspace now records its owning plan; a collision gets its own directory. Existing workspaces are adopted in place. (#2138, #2045)
 - **`review-package` rejects empty or non-descendant `BASE..HEAD` ranges** (exit 3), so an implementer that committed to the wrong branch can't produce a "clean" review of nothing. (#2136, #2050)
-- **On Claude Code, the controller can run one layer down,** as a nested subagent on a mid-tier model. It measured about half the cost and wall clock. It's opt-in: ask for it, or tell your agent your session model is too expensive to spend on coordination. (#2320)
+- **On Claude Code, the controller can run one layer down,** as a nested subagent on a model you approve. It measured about half the cost and wall clock. It's opt-in: ask for it, or tell your agent your session model is too expensive to spend on coordination. (#2320)
 
 ### New Harness Support
 
@@ -357,10 +370,10 @@ Superpowers now runs on three more harnesses. Each ships its own bootstrap, a to
 A long run of cost-and-quality experiments on real projects reshaped how the controller reviews each task. The old flow ran two reviewers per task and leaned on the controller's judgment for model choice and severity, and both turned out to be expensive and easy to game. The new flow runs one reviewer per task, hands work off as files instead of pasted text, and takes several judgment calls away from the controller.
 
 - **One reviewer per task, two verdicts.** A single `task-reviewer-prompt.md` reads the task's diff once and returns both a spec-compliance verdict and a quality verdict, so one fix pass clears both. A new "can't verify from the diff" verdict flags requirements that live in untouched code, for the controller to check itself. (#1538, #1543)
-- **One broad review at the end.** The run finishes with a single whole-branch review on the most capable model, instead of re-reviewing everything task by task.
+- **One broad review at the end.** The run finishes with a single whole-branch review, instead of re-reviewing everything task by task. It runs on the model you approve, or inherits the session's when you approve none.
 - **Plans get a pre-flight read.** Before the first task, the controller checks the plan for internal conflicts — and for anything the plan asks for that a reviewer would flag as a defect — and raises it all at once, rather than stumbling into it mid-run.
 - **Diffs and task text move as files.** A pasted diff parks itself permanently in the most expensive context, and a reviewer without one rebuilds it by hand — the single biggest reviewer cost. Two new scripts, `task-brief` and `review-package`, write the task text and the review diff to files for the subagent to read.
-- **Every dispatch states its model.** Left to choose, controllers stopped naming a model at all — and an unnamed model quietly inherits the session's most expensive one, so one run put all 26 of its reviewers on the top tier. The templates now require a model, with guidance that reaches for cheaper tiers when the work allows.
+- **Every dispatch names a model only with your approval.** Left to choose, controllers either stopped naming a model or reached for a tier on their own judgment. An unnamed model inherits the session's own model, so one run left all 26 of its reviewers on the session tier, above what the work needed. The templates now leave `model` off unless you approve a name, and the controller asks before any dispatch that would name one.
 - **The controller can't tell a reviewer what to ignore.** Real runs caught controllers coaching reviewers to skip a finding or call it "Minor at most," and the flaw shipped. Suppressing findings and pre-rating severity are now banned outright, and a defect the plan itself mandates gets reported for you to decide on rather than waved through.
 - **Reviewers are read-only and skeptical of rationales.** Review no longer touches the working tree or branch — a reviewer running `git checkout` had been orphaning later commits — and an implementer's "I left this unabstracted on purpose" no longer talks a reviewer out of a real finding.
 - **Stronger evidence and reporting.** Reviewers back each answer with a file and line, the implementer's report moves to a file and carries red/green evidence when TDD applies, and a progress ledger lets a controller that loses its context resume instead of redoing finished work. (#994)

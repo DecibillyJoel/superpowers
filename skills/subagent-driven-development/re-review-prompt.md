@@ -10,8 +10,9 @@ that the fix itself broke nothing.
 ```
 Subagent (general-purpose):
   description: "Re-review Task N fix round R"
-  model: [MODEL — REQUIRED: choose per SKILL.md Model Selection; an omitted
-         model silently inherits the session's most expensive one]
+  # No `model` field unless your human partner approved a model for this
+  # dispatch (see SKILL.md's Model Selection). The subagent then inherits
+  # this session's model.
   prompt: |
     You are re-reviewing one task's fix round. A previous review produced
     findings; an implementer has attempted to fix them. Your job is to
@@ -101,8 +102,10 @@ Subagent (general-purpose):
 ```
 
 **Placeholders:**
-- `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection; scoped
-  re-reviews of small fix diffs take a cheap-to-mid tier
+- No `model` field unless your human partner approved one for this dispatch
+  (see SKILL.md's Model Selection). A scoped re-review of a small fix diff
+  is a cheap-to-mid-tier task, so a cheaper tier than your session's is worth
+  proposing. Ask first, and leave the field off until your partner approves.
 - `[BRIEF_FILE]` — the task brief file (same file the implementer worked from)
 - `[FINDINGS]` — the Critical/Important findings and spec gaps from the
   previous review, copied verbatim, one per bullet

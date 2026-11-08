@@ -53,9 +53,10 @@ those, stop and ask.
   superpowers:subagent-driven-development.
 
 A fully specified plan makes inline execution transcription plus testing:
-it runs well on a mid-tier session model, and the one place the most
+it runs well on a mid-tier session model, and the one place a more
 capable model earns its cost is the final review, which this skill
-dispatches separately. Tell your human partner so when they choose inline.
+dispatches separately. Tell your human partner so when they choose inline,
+and ask before you name a model for that review.
 
 Prefer superpowers:subagent-driven-development when your human partner
 wants a review gate on every task, or when the plan is long enough that
@@ -239,17 +240,17 @@ Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE 
 by its absolute path, from the working tree you're executing in (MERGE_BASE = the commit the branch started from, e.g.
 `git merge-base main HEAD`) and review from the file it prints.
 
-**With a subagent tool:** dispatch the reviewer on the most capable
-available model — the whole-branch review is a judgment task — using
+**With a subagent tool:** dispatch the reviewer using
 superpowers:requesting-code-review's
 [code-reviewer.md](../requesting-code-review/code-reviewer.md), with the
 package path, the plan and spec paths, the plan's Review Focus section
 verbatim if it has one (the input classes and failure modes the plan's
 tests do not exercise — the reviewer checks each deliberately), and a
 pointer to the ledger's `Ruling:` lines so it can weigh the calls you
-made. Specify the model
-explicitly; an omitted model inherits the session's, which may not be the
-most capable. This is the one fresh context the whole run buys. Do not
+made. Leave `model` off the dispatch unless your human partner approved a
+name. The whole-branch review is a judgment task, so a more capable tier
+than your session's is worth proposing, with that reason. This is the one
+fresh context the whole run buys. Do not
 skip it, and do not replace it with your own read of the diff.
 
 **Without a subagent tool:** read code-reviewer.md and perform that review

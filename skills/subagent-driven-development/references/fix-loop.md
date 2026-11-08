@@ -26,9 +26,10 @@ choices. If your harness cannot send another message to a live subagent,
 dispatch a fresh implementer carrying the brief path, the report-file path,
 and the findings — the report file is the persistent memory either way.
 
-**Rounds 4-5 — dispatch a fresh implementer on a more capable model** (per
-SKILL.md's Model Selection), with the brief path, the report-file path, the open
-findings, and this framing: "A prior implementer attempted this task
+**Rounds 4-5 — dispatch a fresh implementer.** Ask your human partner to
+approve a more capable model first (per SKILL.md's Model Selection). With no
+approval, dispatch with no `model` field. Send the brief path, the report-file
+path, the open findings, and this framing: "A prior implementer attempted this task
 [N] times; you own it now. Read the report file for what was tried." A loop
 that survives three resumes usually means the implementer cannot see its
 own problem — fresh eyes and a capability bump in one move.

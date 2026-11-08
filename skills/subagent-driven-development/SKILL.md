@@ -139,40 +139,37 @@ ledger.
 
 ## Model Selection
 
-Use the least powerful model that can handle each role to conserve cost and increase speed.
+You do not choose a subagent's model. Your human partner chooses it, and you
+ask before you name one.
 
-**Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
+**Omit `model` unless your human partner approved that model for that
+dispatch.** An omitted model inherits the calling session's own model, so it
+costs exactly what your own turns cost and never escalates to a top tier.
 
-**Integration and judgment tasks** (multi-file coordination, pattern matching, debugging): use a standard model.
+**Ask before every dispatch that would name a model.** State the model, the
+tier it sits in, and the reason the task needs a different tier from your
+session's. Add the `model` field only after your partner approves that name.
+With no answer, dispatch with no `model` field.
 
-**Architecture and design tasks**: use the most capable available model.
-The final whole-branch review is one of these — dispatch it on the most
-capable available model, not the session default.
+**A subagent cannot ask your human partner.** Only the top-level session can.
+A child running its own fan-out never names a model; it inherits its parent's
+tier. Before handing a whole plan to an orchestrator, collect the approved
+model names and pass them in, or tell it to leave `model` off every spawn.
 
-**Review tasks**: choose the model with the same judgment, scaled to the
-diff's size, complexity, and risk. A small mechanical diff does not need the
-most capable model; a subtle concurrency change does. Scoped re-reviews of
-small fix diffs take a cheap-to-mid tier.
+Cases worth raising, each with its reason:
+- 1-2 files with a complete spec: a cheaper tier does the job, because the
+  work is transcription plus testing.
+- Multiple files with integration concerns: a standard tier.
+- Architecture, design, or broad codebase judgment: the most capable tier.
+- The whole-branch review: a more capable tier earns its cost on judgment.
+- A loop that survives three rounds: a reasoning problem, not an effort
+  problem, so a more capable implementer is worth proposing.
+- Turn count beats token price: the cheapest models routinely take 2-3× the
+  turns on multi-step work and cost more overall, so a cheap tier is safe only
+  for a task with few steps.
 
-**Fix-loop escalation (rounds 4-5)**: use a model at least one tier above
-the implementer that got stuck.
-
-**Always specify the model explicitly when dispatching a subagent.** An
-omitted model inherits your session's model — often the most capable and
-most expensive — which silently defeats this section.
-
-**Turn count beats token price.** Wall-clock and context cost scale with how
-many turns a subagent takes, and the cheapest models routinely take 2-3× the
-turns on multi-step work — costing more overall. Use a mid-tier model as the
-floor for reviewers and for implementers working from prose descriptions.
-When the task's plan text contains the complete code to write, the
-implementation is transcription plus testing: use the cheapest tier for
-that implementer. Single-file mechanical fixes also take the cheapest tier.
-
-**Task complexity signals (implementation tasks):**
-- Touches 1-2 files with a complete spec → cheap model
-- Touches multiple files with integration concerns → standard model
-- Requires design judgment or broad codebase understanding → most capable model
+**Never copy a model name** from a skill, a table, another document, or an old
+transcript. Model ids go stale, and the valid list differs per harness.
 
 ## The Task Loop
 
